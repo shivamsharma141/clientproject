@@ -490,7 +490,7 @@ try {
           <form onSubmit={handleLogin} noValidate className={styles.form}>
             <div className={styles.formHead}>
               <h1 className={styles.title}>Welcome back</h1>
-              <p className={styles.sub}>Sign in to your account</p>
+              <p className={styles.sub}> login into your account</p>
             </div>
 
             <FieldInput
@@ -546,7 +546,7 @@ try {
               className={styles.primaryBtn}
               disabled={!loginValid || loginLoading}
             >
-              {loginLoading ? <Spinner /> : "Sign In →"}
+              {loginLoading ? <Spinner /> : "Login →"}
             </button>
 
             <p className={styles.switchRow}>
