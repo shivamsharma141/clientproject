@@ -1,393 +1,623 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import styles from "./checkout.module.css";
 import { useCart } from "../component/Cartcontext.js";
+import styles from "./checkout.module.css";
 
-const RAZORPAY_KEY = "rzp_test_XXXXXXXXXXXXXXXX"; // Replace with your actual Razorpay key
+// ─────────────────────────────────────────────
+//  🔧 CONFIG — edit these 3 lines only
+// ─────────────────────────────────────────────
+const UPI_ID          = "7982706406@pthdfc";
+const MERCHANT_NAME   = "Yashodha Dairy Farmin";
+const WHATSAPP_NUMBER = "918506000615";
+// ─────────────────────────────────────────────
 
 const DELHI_KEYWORDS = [
-  "delhi",
-  "new delhi",
-  "north delhi",
-  "south delhi",
-  "east delhi",
-  "west delhi",
-  "central delhi",
-  "ndmc",
+  "delhi","new delhi","north delhi","south delhi",
+  "east delhi","west delhi","central delhi","ndmc",
 ];
+const DELHI_PINCODES = new Set(
+  Array.from({ length: 99 }, (_, i) => `1100${String(i + 1).padStart(2, "0")}`)
+);
 
-const DELHI_PINCODES = [
-  "110001","110002","110003","110004","110005","110006","110007","110008","110009","110010",
-  "110011","110012","110013","110014","110015","110016","110017","110018","110019","110020",
-  "110021","110022","110023","110024","110025","110026","110027","110028","110029","110030",
-  "110031","110032","110033","110034","110035","110036","110037","110038","110039","110040",
-  "110041","110042","110043","110044","110045","110046","110047","110048","110049","110050",
-  "110051","110052","110053","110054","110055","110056","110057","110058","110059","110060",
-  "110061","110062","110063","110064","110065","110066","110067","110068","110069","110070",
-  "110071","110072","110073","110074","110075","110076","110077","110078","110079","110080",
-  "110081","110082","110083","110084","110085","110086","110087","110088","110089","110090",
-  "110091","110092","110093","110094","110095","110096","110097","110098","110099",
-];
-
-function isDelhi(city, pincode) {
-  const cityLower = city.toLowerCase().trim();
-  const isDelhiCity = DELHI_KEYWORDS.some((k) => cityLower.includes(k));
-  const isDelhiPin = DELHI_PINCODES.includes(pincode.trim());
-  return isDelhiCity || isDelhiPin;
+function checkDelhi(city = "", pincode = "") {
+  const c = city.toLowerCase().trim();
+  const p = pincode.trim();
+  return DELHI_KEYWORDS.some((k) => c.includes(k)) || DELHI_PINCODES.has(p);
 }
 
+function isMobile() {
+  if (typeof navigator === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+}
+
+function buildUpiUrl(amount, orderId) {
+  const note = encodeURIComponent(`Order #${orderId} - ${MERCHANT_NAME}`);
+  return `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR&tn=${note}`;
+}
+
+// ── tiny SVG icons ─────────────────────────────────────────────────────────
+const IconCheck = () => (
+  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+    <circle cx="7.5" cy="7.5" r="7.5" fill="#22c55e" />
+    <path d="M4 7.5l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const IconWarn = () => (
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+    <circle cx="6.5" cy="6.5" r="6" stroke="#ef4444" strokeWidth="1.3" />
+    <path d="M6.5 4v3M6.5 9h.01" stroke="#ef4444" strokeWidth="1.3" strokeLinecap="round" />
+  </svg>
+);
+const IconUPI = () => (
+  <svg width="32" height="32" viewBox="0 0 48 48">
+    <rect width="48" height="48" rx="10" fill="#1a1a2e" />
+    <text x="24" y="31" textAnchor="middle" fill="#f0b429" fontSize="15" fontWeight="800" fontFamily="Georgia,serif">UPI</text>
+  </svg>
+);
+const IconCOD = () => (
+  <svg width="32" height="32" viewBox="0 0 48 48">
+    <rect width="48" height="48" rx="10" fill="#78350f" />
+    <circle cx="24" cy="24" r="11" stroke="#fbbf24" strokeWidth="2.2" fill="none" />
+    <path d="M24 17v14M18 24h12" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" />
+  </svg>
+);
+const IconWA = () => (
+  <svg width="19" height="19" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="16" fill="#25D366" />
+    <path d="M22.5 9.5A9.1 9.1 0 0 0 7.2 20.4L6 26l5.8-1.5a9 9 0 0 0 4.3 1.1 9.1 9.1 0 0 0 6.4-15.6z" fill="#fff" />
+    <path d="M20.5 18.9c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1l-.8.9c-.1.2-.3.2-.5.1a7.5 7.5 0 0 1-3.8-3.3c-.1-.3 0-.4.2-.6l.5-.6.2-.4-1-2.3c-.3-.6-.5-.5-.7-.5h-.5c-.2 0-.5.1-.7.3a3.6 3.6 0 0 0-1.1 2.7c0 1.6 1.1 3.1 1.2 3.3.2.2 2.2 3.4 5.4 4.7.8.3 1.4.5 1.8.6.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.1-1.5.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z" fill="#25D366" />
+  </svg>
+);
+const IconArrow = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// ── Reusable warning banner ────────────────────────────────────────────────
+function WaBanner({ text }) {
+  return (
+    <div style={{
+      background: "#fff8e1", border: "1px solid #ffe082", borderRadius: 10,
+      padding: "11px 16px", fontSize: "0.78rem", color: "#7a5800",
+      lineHeight: 1.7, display: "flex", gap: 9, alignItems: "flex-start",
+    }}>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+      <span dangerouslySetInnerHTML={{ __html: text }} />
+    </div>
+  );
+}
+
+// ── QR Modal (desktop only) ────────────────────────────────────────────────
+function UpiModal({ upiUrl, amount, onClose }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    import("qrcode").then((QRCode) => {
+      if (canvasRef.current) {
+        QRCode.toCanvas(canvasRef.current, upiUrl, {
+          width: 220,
+          margin: 2,
+          color: { dark: "#1a2e1b", light: "#fdfaf5" },
+        });
+      }
+    });
+  }, [upiUrl]);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 999,
+        background: "rgba(0,0,0,0.55)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fdfaf5", borderRadius: 18, padding: "32px 28px",
+          textAlign: "center", maxWidth: 300, width: "90%",
+        }}
+      >
+        <div style={{ fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8a7a6a", marginBottom: 4 }}>
+          Scan to Pay
+        </div>
+        <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#1a2e1b", marginBottom: 18 }}>
+          ₹{amount.toLocaleString("en-IN")}
+        </div>
+
+        <canvas ref={canvasRef} style={{ borderRadius: 10, display: "block", margin: "0 auto" }} />
+
+        <p style={{ fontSize: "0.78rem", color: "#9a8a78", marginTop: 16, lineHeight: 1.6, marginBottom: 4 }}>
+          Scan with GPay, PhonePe, Paytm or any UPI app
+        </p>
+        <div style={{ fontSize: "0.7rem", color: "#bbb", wordBreak: "break-all", marginBottom: 14 }}>
+          {UPI_ID}
+        </div>
+
+        {/* ⚠️ Note inside QR modal */}
+        <WaBanner text="<strong>Your order will only be confirmed after you send a WhatsApp message.</strong> Please do not skip that step after closing this." />
+
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: 16, width: "100%", padding: "11px 0", borderRadius: 10,
+            border: "1.5px solid #ddd6c8", background: "transparent",
+            fontSize: "0.88rem", color: "#6b5e50", cursor: "pointer",
+          }}
+        >
+          Payment Done — Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 export default function CheckoutPage() {
   const router = useRouter();
-
-  // ── Cart data ──────────────────────────────────────────────
   const { cartItems, cartTotal } = useCart();
 
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    address: "",
-    city: "",
-    pincode: "",
+    fullName: "", phone: "", email: "",
+    address: "", city: "", pincode: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState("online");
-  const [isDelhi_, setIsDelhi_] = useState(false);
-  const [formFilled, setFormFilled] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [touched, setTouched]       = useState({});
+  const [payMethod, setPayMethod]   = useState("upi");
+  const [isDelhi, setIsDelhi]       = useState(false);
+  const [step, setStep]             = useState("form");
+  const [loading, setLoading]       = useState(false);
+  const [savedOrder, setSavedOrder] = useState(null);
+  const [mounted, setMounted]       = useState(false);
+  const [qrUrl, setQrUrl]           = useState(null);
 
-  // Redirect to cart if cart is empty
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
-    if (cartItems.length === 0) {
-      router.push("/cart");
-    }
-  }, [cartItems, router]);
-
-  // Load Razorpay script
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => setRazorpayLoaded(true);
-    document.body.appendChild(script);
-  }, []);
+    if (mounted && cartItems.length === 0) router.push("/cart");
+  }, [cartItems, mounted, router]);
 
   useEffect(() => {
-    const delhiStatus = isDelhi(form.city, form.pincode);
-    setIsDelhi_(delhiStatus);
-    if (!delhiStatus && paymentMethod === "cod") {
-      setPaymentMethod("online");
-    }
+    const d = checkDelhi(form.city, form.pincode);
+    setIsDelhi(d);
+    if (!d && payMethod === "cod") setPayMethod("upi");
   }, [form.city, form.pincode]);
 
-  useEffect(() => {
-    const allFilled =
-      form.fullName.trim() &&
-      form.phone.trim().length === 10 &&
-      form.address.trim() &&
-      form.city.trim() &&
-      form.pincode.trim().length === 6;
-    setFormFilled(!!allFilled);
-  }, [form]);
+  const rules = {
+    fullName: (v) => !v.trim() ? "Full name is required" : v.trim().length < 2 ? "Name is too short" : "",
+    phone:    (v) => !/^\d{10}$/.test(v.trim()) ? "Enter a valid 10-digit number" : "",
+    email:    (v) => v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "Enter a valid email" : "",
+    address:  (v) => !v.trim() ? "Address is required" : v.trim().length < 10 ? "Please enter your full address" : "",
+    city:     (v) => !v.trim() ? "City is required" : "",
+    pincode:  (v) => !/^\d{6}$/.test(v.trim()) ? "Enter a valid 6-digit pincode" : "",
+  };
+  const errOf  = (f) => (touched[f] ? rules[f](form[f]) : "");
+  const allOk  = Object.keys(rules).every((f) => !rules[f](form[f]));
+  const formOk = ["fullName","phone","address","city","pincode"].every((f) => !rules[f](form[f]));
+
+  const touch    = (name) => setTouched((p) => ({ ...p, [name]: true }));
+  const touchAll = () =>
+    setTouched(Object.keys(rules).reduce((a, k) => ({ ...a, [k]: true }), {}));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+    if ((name === "phone" || name === "pincode") && !/^\d*$/.test(value)) return;
+    setForm((p) => ({ ...p, [name]: value }));
+  };
+
+  const handleReview = () => {
+    touchAll();
+    if (!allOk) return;
+    setStep("review");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handlePlaceOrder = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/createorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          items: cartItems,
+          total: cartTotal,
+          paymentMethod: payMethod.toUpperCase(),
+          status: payMethod === "cod" ? "confirmed" : "pending_payment",
+        }),
+      });
+
+      if (!res.ok) throw new Error("Server error");
+      const data = await res.json();
+      setSavedOrder(data.order);
+
+      if (payMethod === "upi") {
+        const orderId = data.order._id?.toString().slice(-6).toUpperCase() || "000000";
+        const upiUrl  = buildUpiUrl(cartTotal, orderId);
+
+        if (isMobile()) {
+          window.location.href = upiUrl;
+          setTimeout(() => setStep("done"), 1500);
+        } else {
+          setQrUrl(upiUrl);
+        }
+      } else {
+        setStep("done");
+      }
+    } catch (err) {
+      alert("Something went wrong, please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const validate = () => {
-    const newErrors = {};
-    if (!form.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!form.phone.trim() || form.phone.trim().length !== 10)
-      newErrors.phone = "Enter valid 10-digit mobile number";
-    if (!form.address.trim()) newErrors.address = "Address is required";
-    if (!form.city.trim()) newErrors.city = "City is required";
-    if (!form.pincode.trim() || form.pincode.trim().length !== 6)
-      newErrors.pincode = "Enter valid 6-digit pincode";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleQRClose = () => {
+    setQrUrl(null);
+    setStep("done");
   };
 
-  const handleRazorpay = () => {
-    if (!razorpayLoaded) {
-      alert("Payment gateway loading, please try again.");
-      return;
-    }
-    const options = {
-      key: RAZORPAY_KEY,
-      amount: cartTotal * 100,           // ← dynamic total
-      currency: "INR",
-      name: "Gaav Se",
-      description: `Order (${cartItems.length} item${cartItems.length > 1 ? "s" : ""})`,
-      image: "/logo.png",
-      prefill: {
-        name: form.fullName,
-        email: form.email,
-        contact: form.phone,
-      },
-      notes: {
-        address: `${form.address}, ${form.city} - ${form.pincode}`,
-      },
-      theme: { color: "#4a9e6a" },
-      handler: function (response) {
-        alert(
-          `Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`
-        );
-      },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+  const openWhatsApp = () => {
+    const orderId = savedOrder?._id?.toString().slice(-6).toUpperCase() || "—";
+    const lines = cartItems
+      .map((i) => `  • ${i.name} ×${i.quantity}  ₹${(i.price * i.quantity).toLocaleString("en-IN")}`)
+      .join("\n");
+    const msg =
+      `🛍️ *Order Confirmation*\n` +
+      `Order ID: *#${orderId}*\n\n` +
+      `👤 *${form.fullName}*\n` +
+      `📞 ${form.phone}\n` +
+      `📍 ${form.address}, ${form.city} – ${form.pincode}\n\n` +
+      `*Items:*\n${lines}\n\n` +
+      `💰 *Total: ₹${cartTotal.toLocaleString("en-IN")}*\n` +
+      `💳 Payment: ${payMethod === "cod" ? "Cash on Delivery" : "UPI"}\n\n` +
+      `✅ Please confirm my order!`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  const handleSubmit = () => {
-    if (!validate()) return;
-    if (paymentMethod === "online") {
-      handleRazorpay();
-    } else {
-      alert("Order placed with Cash on Delivery!");
-    }
-  };
-
-  const buttonLabel = formFilled
-    ? paymentMethod === "cod"
-      ? "Place Order (COD)"
-      : "Pay & Place Order"
-    : "Fill Details Above";
-
-  // Don't render if cart is empty (redirect is happening)
-  if (cartItems.length === 0) return null;
+  if (!mounted || cartItems.length === 0) return null;
 
   return (
     <div className={styles.page}>
       <div className={styles.container}>
+
+        {/* ── PROGRESS BAR ── */}
+        <div className={styles.progress}>
+          {["Details", "Review", "Payment"].map((label, i) => {
+            const idx = ["form","review","done"].indexOf(step);
+            const done = i < idx;
+            const active = i === idx;
+            return (
+              <div key={label} className={styles.progressItem}>
+                <div className={`${styles.progressDot} ${active ? styles.progressActive : done ? styles.progressDone : ""}`}>
+                  {done ? "✓" : i + 1}
+                </div>
+                <span className={`${styles.progressLabel} ${active ? styles.progressLabelActive : ""}`}>{label}</span>
+                {i < 2 && <div className={`${styles.progressLine} ${done ? styles.progressLineDone : ""}`} />}
+              </div>
+            );
+          })}
+        </div>
+
         <h1 className={styles.title}>Checkout</h1>
 
-        <div className={styles.grid}>
-          {/* LEFT COLUMN */}
-          <div className={styles.left}>
-            {/* Customer Details */}
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Customer Details</h2>
-              <div className={styles.divider} />
+        {/* ⚠️ Top-level global notice on all steps */}
+        <div style={{ marginBottom: 24 }}>
+          <WaBanner text="<strong>Your order will only be confirmed after you send a WhatsApp message.</strong> After placing your order, tap <strong>'Confirm Order on WhatsApp'</strong> — without this step your order will not be processed." />
+        </div>
 
-              <div className={styles.row2}>
-                <div className={styles.field}>
-                  <label className={styles.label}>FULL NAME *</label>
-                  <input
-                    className={`${styles.input} ${errors.fullName ? styles.inputError : ""}`}
-                    type="text"
-                    name="fullName"
-                    placeholder="Your full name"
-                    value={form.fullName}
-                    onChange={handleChange}
-                  />
-                  {errors.fullName && (
-                    <span className={styles.error}>{errors.fullName}</span>
-                  )}
+        {/* ════════════════════════════════════════
+            STEP 1 — FORM
+        ════════════════════════════════════════ */}
+        {step === "form" && (
+          <div className={styles.grid}>
+            <div className={styles.left}>
+
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}><span>👤</span> Customer Details</h2>
+
+                <F label="Full Name" required err={errOf("fullName")}>
+                  <I name="fullName" placeholder="Your full name" value={form.fullName}
+                    onChange={handleChange} onBlur={() => touch("fullName")}
+                    ok={!errOf("fullName") && touched.fullName && form.fullName}
+                    err={!!errOf("fullName")} />
+                </F>
+
+                <div className={styles.row2}>
+                  <F label="Phone" required err={errOf("phone")}>
+                    <I name="phone" placeholder="10-digit number" value={form.phone} maxLength={10}
+                      onChange={handleChange} onBlur={() => touch("phone")}
+                      ok={!errOf("phone") && touched.phone && form.phone}
+                      err={!!errOf("phone")} />
+                  </F>
+                  <F label="Email" err={errOf("email")}>
+                    <I name="email" placeholder="Optional" value={form.email}
+                      onChange={handleChange} onBlur={() => touch("email")}
+                      ok={!errOf("email") && touched.email && form.email}
+                      err={!!errOf("email")} />
+                  </F>
                 </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>PHONE NUMBER *</label>
-                  <input
-                    className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
-                    type="tel"
-                    name="phone"
-                    placeholder="10-digit mobile number"
-                    maxLength={10}
-                    value={form.phone}
-                    onChange={handleChange}
-                  />
-                  {errors.phone && (
-                    <span className={styles.error}>{errors.phone}</span>
-                  )}
-                </div>
-              </div>
+              </section>
 
-              <div className={styles.field}>
-                <label className={styles.label}>EMAIL</label>
-                <input
-                  className={styles.input}
-                  type="email"
-                  name="email"
-                  placeholder="your@email.com"
-                  value={form.email}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+              <section className={styles.card}>
+                <h2 className={styles.cardTitle}><span>📍</span> Delivery Address</h2>
 
-            {/* Delivery Address */}
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Delivery Address</h2>
-              <div className={styles.divider} />
-
-              <div className={styles.field}>
-                <label className={styles.label}>FULL ADDRESS *</label>
-                <textarea
-                  className={`${styles.textarea} ${errors.address ? styles.inputError : ""}`}
-                  name="address"
-                  placeholder="House no., Street, Locality..."
-                  value={form.address}
-                  onChange={handleChange}
-                  rows={3}
-                />
-                {errors.address && (
-                  <span className={styles.error}>{errors.address}</span>
-                )}
-              </div>
-
-              <div className={styles.row2}>
-                <div className={styles.field}>
-                  <label className={styles.label}>CITY *</label>
-                  <input
-                    className={`${styles.input} ${errors.city ? styles.inputError : ""}`}
-                    type="text"
-                    name="city"
-                    placeholder="City"
-                    value={form.city}
-                    onChange={handleChange}
-                  />
-                  {errors.city && (
-                    <span className={styles.error}>{errors.city}</span>
-                  )}
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>PINCODE *</label>
-                  <input
-                    className={`${styles.input} ${errors.pincode ? styles.inputError : ""}`}
-                    type="text"
-                    name="pincode"
-                    placeholder="6-digit pincode"
-                    maxLength={6}
-                    value={form.pincode}
-                    onChange={handleChange}
-                  />
-                  {errors.pincode && (
-                    <span className={styles.error}>{errors.pincode}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Method — only shown when form is filled */}
-            {formFilled && (
-              <div className={styles.card}>
-                <h2 className={styles.cardTitle}>Payment Method</h2>
-                <div className={styles.divider} />
-
-                {!isDelhi_ && (
-                  <div className={styles.infoBox}>
-                    <span className={styles.infoIcon}>ℹ</span>
-                    Outside Delhi, only prepaid orders are accepted.
-                  </div>
-                )}
-
-                <div className={styles.paymentOptions}>
-                  <label
-                    className={`${styles.paymentOption} ${paymentMethod === "online" ? styles.paymentSelected : ""}`}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="online"
-                      checked={paymentMethod === "online"}
-                      onChange={() => setPaymentMethod("online")}
-                      className={styles.radioInput}
+                <F label="Full Address" required err={errOf("address")}>
+                  <div className={styles.inputWrap}>
+                    <textarea
+                      className={`${styles.textarea}${errOf("address") ? " " + styles.inputErr : !errOf("address") && touched.address && form.address ? " " + styles.inputOk : ""}`}
+                      name="address" placeholder="House/flat no., street, area, landmark..."
+                      value={form.address} onChange={handleChange} onBlur={() => touch("address")}
                     />
-                    <div className={styles.paymentIcon}>
-                      <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-                        <rect width="28" height="20" rx="3" fill="#F5A623" />
-                        <rect x="0" y="5" width="28" height="5" fill="#C8811A" />
-                        <rect x="3" y="13" width="6" height="2" rx="1" fill="white" opacity="0.7" />
-                      </svg>
-                    </div>
-                    <div className={styles.paymentInfo}>
-                      <span className={styles.paymentName}>Online Payment</span>
-                      <span className={styles.paymentSub}>Razorpay — UPI, Cards, Net Banking</span>
-                    </div>
-                  </label>
+                  </div>
+                </F>
 
-                  {isDelhi_ && (
-                    <label
-                      className={`${styles.paymentOption} ${paymentMethod === "cod" ? styles.paymentSelected : ""}`}
+                <div className={styles.row2}>
+                  <F label="City" required err={errOf("city")}>
+                    <div className={styles.inputWrap}>
+                      <I name="city" placeholder="City" value={form.city}
+                        onChange={handleChange} onBlur={() => touch("city")}
+                        ok={!errOf("city") && touched.city && form.city}
+                        err={!!errOf("city")} />
+                      {isDelhi && <span className={styles.delhiBadge}>Delhi ✓</span>}
+                    </div>
+                  </F>
+                  <F label="Pincode" required err={errOf("pincode")}>
+                    <I name="pincode" placeholder="6-digit" value={form.pincode} maxLength={6}
+                      onChange={handleChange} onBlur={() => touch("pincode")}
+                      ok={!errOf("pincode") && touched.pincode && form.pincode}
+                      err={!!errOf("pincode")} />
+                  </F>
+                </div>
+              </section>
+
+              {formOk && (
+                <section className={`${styles.card} ${styles.cardAnimate}`}>
+                  <h2 className={styles.cardTitle}><span>💳</span> Payment Method</h2>
+
+                  <div
+                    className={`${styles.payOpt} ${payMethod === "upi" ? styles.payOptSelected : ""}`}
+                    onClick={() => setPayMethod("upi")}
+                  >
+                    <input type="radio" className={styles.radio} readOnly checked={payMethod === "upi"} />
+                    <IconUPI />
+                    <div className={styles.payInfo}>
+                      <div className={styles.payName}>Pay via UPI</div>
+                      <div className={styles.paySub}>GPay · PhonePe · Paytm · any UPI app</div>
+                    </div>
+                    <span className={styles.payBadge}>Instant</span>
+                  </div>
+
+                  {isDelhi && (
+                    <div
+                      className={`${styles.payOpt} ${payMethod === "cod" ? styles.payOptSelected : ""}`}
+                      onClick={() => setPayMethod("cod")}
                     >
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="cod"
-                        checked={paymentMethod === "cod"}
-                        onChange={() => setPaymentMethod("cod")}
-                        className={styles.radioInput}
-                      />
-                      <div className={styles.paymentIcon}>
-                        <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
-                          <rect width="28" height="20" rx="3" fill="#4a9e6a" />
-                          <circle cx="14" cy="10" r="5" fill="white" opacity="0.3" />
-                          <text x="14" y="14" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold">₹</text>
-                        </svg>
+                      <input type="radio" className={styles.radio} readOnly checked={payMethod === "cod"} />
+                      <IconCOD />
+                      <div className={styles.payInfo}>
+                        <div className={styles.payName}>Cash on Delivery</div>
+                        <div className={styles.paySub}>Pay cash at delivery · Delhi only</div>
                       </div>
-                      <div className={styles.paymentInfo}>
-                        <span className={styles.paymentName}>Cash on Delivery</span>
-                        <span className={styles.paymentSub}>Available only in Delhi</span>
-                      </div>
-                    </label>
+                    </div>
                   )}
+
+                  {/* ⚠️ Note below payment options */}
+                  <p style={{ fontSize: "0.74rem", color: "#9a8a78", marginTop: 14, lineHeight: 1.6 }}>
+                    📌 After payment, you must confirm your order on WhatsApp. Your order is not final until we receive your WhatsApp message.
+                  </p>
+                </section>
+              )}
+            </div>
+
+            <div className={styles.right}>
+              <div className={styles.summary}>
+                <h2 className={styles.summaryTitle}>Order Summary</h2>
+
+                {cartItems.map((item) => (
+                  <div className={styles.summaryItem} key={item.itemId}>
+                    <div>
+                      <div className={styles.iName}>{item.name}</div>
+                      <div className={styles.iQty}>Qty: {item.quantity}</div>
+                    </div>
+                    <div className={styles.iPrice}>
+                      ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                ))}
+
+                <div className={styles.divider} />
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Total</span>
+                  <span className={styles.totalAmt}>₹{cartTotal.toLocaleString("en-IN")}</span>
                 </div>
 
-                <p className={styles.paymentNote}>
-                  {isDelhi_
-                    ? "Cash on Delivery & Online payment available for Delhi."
-                    : "Cash on Delivery available only in Delhi. Online payment available for all locations."}
+                <button className={styles.ctaBtn} onClick={handleReview}>
+                  Review Order &nbsp;<IconArrow />
+                </button>
+
+                {!formOk && <p className={styles.hint}>Please fill all required fields</p>}
+
+                {/* ⚠️ Note inside order summary */}
+                <p style={{ fontSize: "0.72rem", color: "#b0a090", marginTop: 14, textAlign: "center", lineHeight: 1.6 }}>
+                  ⚠️ Order confirmed only after WhatsApp message
                 </p>
               </div>
-            )}
+            </div>
           </div>
+        )}
 
-          {/* RIGHT COLUMN — Order Summary (DYNAMIC) */}
-          <div className={styles.right}>
-            <div className={styles.summaryCard}>
-              <h2 className={styles.cardTitle}>Order Summary</h2>
-              <div className={styles.divider} />
+        {/* ════════════════════════════════════════
+            STEP 2 — REVIEW
+        ════════════════════════════════════════ */}
+        {step === "review" && (
+          <div className={styles.reviewWrap}>
+            <div className={styles.reviewCard}>
+              <h2 className={styles.reviewTitle}>Order Review</h2>
+              <p className={styles.reviewSub}>Please check everything before paying 👇</p>
 
-              {/* Dynamic cart items list */}
-              {cartItems.map((item) => (
-                <div key={item.itemId} className={styles.summaryItem}>
-                  <div>
-                    <p className={styles.productName}>{item.name}</p>
-                    <p className={styles.productQty}>
-                      {item.variantLabel} × {item.quantity}
-                    </p>
-                  </div>
-                  <span className={styles.productPrice}>
-                    ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                  </span>
-                </div>
-              ))}
-
-              <div className={styles.divider} />
-
-              {/* Dynamic total */}
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Total</span>
-                <span className={styles.totalAmount}>
-                  ₹{cartTotal.toLocaleString("en-IN")}
-                </span>
+              <div className={styles.reviewSection}>
+                <div className={styles.reviewSectionTitle}>Customer</div>
+                <Row k="Name"  v={form.fullName} />
+                <Row k="Phone" v={form.phone} />
+                {form.email && <Row k="Email" v={form.email} />}
               </div>
 
-              <button
-                className={`${styles.ctaBtn} ${!formFilled ? styles.ctaBtnDisabled : ""}`}
-                onClick={handleSubmit}
-                disabled={false}
-              >
-                {buttonLabel}
+              <div className={styles.reviewSection}>
+                <div className={styles.reviewSectionTitle}>Delivery</div>
+                <Row k="Address" v={form.address} />
+                <Row k="City"    v={`${form.city} – ${form.pincode}`} />
+              </div>
+
+              <div className={styles.reviewSection}>
+                <div className={styles.reviewSectionTitle}>Items</div>
+                {cartItems.map((item) => (
+                  <Row
+                    key={item.itemId}
+                    k={`${item.name} ×${item.quantity}`}
+                    v={`₹${(item.price * item.quantity).toLocaleString("en-IN")}`}
+                  />
+                ))}
+                <div className={styles.reviewTotal}>
+                  <span>Total</span>
+                  <span>₹{cartTotal.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+
+              <div className={styles.reviewSection}>
+                <div className={styles.reviewSectionTitle}>Payment</div>
+                <Row k="Method" v={payMethod === "cod" ? "Cash on Delivery" : "UPI"} />
+              </div>
+
+              {/* ⚠️ Note on review page */}
+              <div style={{ margin: "16px 0" }}>
+                <WaBanner text="<strong>Important:</strong> Your order will only be confirmed after you tap <strong>'Confirm on WhatsApp'</strong> below. Do not skip this step." />
+              </div>
+
+              <div className={styles.reviewActions}>
+                {payMethod === "upi" ? (
+                  <button
+                    className={`${styles.ctaBtn} ${styles.upiBtn}`}
+                    onClick={handlePlaceOrder}
+                    disabled={loading}
+                  >
+                    <IconUPI />
+                    {loading ? "Processing..." : `Pay ₹${cartTotal.toLocaleString("en-IN")} via UPI`}
+                  </button>
+                ) : (
+                  <button
+                    className={`${styles.ctaBtn} ${styles.codBtn}`}
+                    onClick={handlePlaceOrder}
+                    disabled={loading}
+                  >
+                    <IconCOD />
+                    {loading ? "Saving order..." : "Place Order (Cash on Delivery)"}
+                  </button>
+                )}
+
+                <button className={styles.waBtn} onClick={() => { handlePlaceOrder().then(openWhatsApp); }}>
+                  <IconWA /> Confirm on WhatsApp
+                </button>
+              </div>
+
+              <button className={styles.backBtn} onClick={() => setStep("form")}>
+                ← Edit Details
               </button>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* ════════════════════════════════════════
+            STEP 3 — DONE
+        ════════════════════════════════════════ */}
+        {step === "done" && (
+          <div className={styles.doneWrap}>
+            <div className={styles.doneIcon}>🎉</div>
+            <h2 className={styles.doneTitle}>Order Placed!</h2>
+            {savedOrder && (
+              <div className={styles.doneId}>
+                Order ID: <strong>#{savedOrder._id?.toString().slice(-6).toUpperCase()}</strong>
+              </div>
+            )}
+
+            {/* ⚠️ Big note on done screen */}
+            <div style={{ maxWidth: 380, margin: "16px auto" }}>
+              <WaBanner text={
+                payMethod === "upi"
+                  ? "<strong>Your order is not confirmed yet!</strong> Please complete your UPI payment first, then send us a WhatsApp message. Without WhatsApp confirmation, your order will not be processed."
+                  : "<strong>Your order is not confirmed yet!</strong> Please send us a WhatsApp message to confirm your order. Without this step, your order will not be processed."
+              } />
+            </div>
+
+            <button className={styles.waBtn} style={{ maxWidth: 320, margin: "0 auto" }} onClick={openWhatsApp}>
+              <IconWA /> Confirm Order on WhatsApp
+            </button>
+            <button className={styles.backBtn} onClick={() => router.push("/")}>
+              Go to Home →
+            </button>
+          </div>
+        )}
+
+        {/* ── QR Modal — shows on desktop after UPI order ── */}
+        {qrUrl && (
+          <UpiModal
+            upiUrl={qrUrl}
+            amount={cartTotal}
+            onClose={handleQRClose}
+          />
+        )}
+
       </div>
+    </div>
+  );
+}
+
+// ── tiny helpers ──────────────────────────────────────────────────────────────
+function F({ label, required, err, children }) {
+  return (
+    <div className="co-f" style={{ marginBottom: 16 }}>
+      <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8a7a6a", marginBottom: 6 }}>
+        {label}{required && <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>}
+      </label>
+      {children}
+      {err && (
+        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 5, fontSize: "0.74rem", color: "#ef4444" }}>
+          <IconWarn /> {err}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function I({ name, placeholder, value, onChange, onBlur, ok, err, maxLength }) {
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        style={{
+          width: "100%", border: `1.5px solid ${err ? "#ef4444" : ok ? "#22c55e" : "#ddd6c8"}`,
+          borderRadius: 10, padding: "12px 38px 12px 14px", fontSize: "0.92rem", color: "#1a2e1b",
+          background: "#fdfaf5", outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+          transition: "border-color .2s, box-shadow .2s",
+        }}
+        name={name} placeholder={placeholder} value={value}
+        onChange={onChange} onBlur={onBlur} maxLength={maxLength}
+        onFocus={(e) => { e.target.style.borderColor = "#2c6e49"; e.target.style.boxShadow = "0 0 0 3px rgba(44,110,73,0.1)"; }}
+      />
+      {ok && (
+        <span style={{ position: "absolute", right: 11, top: "50%", transform: "translateY(-50%)" }}>
+          <IconCheck />
+        </span>
+      )}
+    </div>
+  );
+}
+
+function Row({ k, v }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", padding: "9px 0", borderBottom: "1px solid #f5f0e8", fontSize: "0.89rem", gap: 12 }}>
+      <span style={{ color: "#9a8a78" }}>{k}</span>
+      <span style={{ fontWeight: 500, color: "#1a2e1b", textAlign: "right", maxWidth: "62%" }}>{v}</span>
     </div>
   );
 }

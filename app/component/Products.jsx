@@ -22,7 +22,7 @@ const PRODUCTS = [
     name: 'A2 Desi Cow Bilona Ghee',
     badge: 'BESTSELLER',
     icon: '🫙',
-    image: 'https://images.unsplash.com/photo-1604908811721-0f5e7c5f9b09?q=80&w=800',
+    image: '/cowghee.png',
     variants: [
       { label: '250 ml (Trial Pack)', price: 650 },
       { label: '500 ml (Glass Jar)', price: 1200 },
@@ -38,7 +38,7 @@ const PRODUCTS = [
     name: 'Buffalo Bilona Ghee',
     badge: null,
     icon: '🫙',
-    image: 'https://images.unsplash.com/photo-1587049352851-8d4e89133924?q=80&w=800',
+    image: '/buffaloghee.png',
     variants: [
       { label: '250 ml', price: 450 },
       { label: '500 ml', price: 875 },
@@ -54,7 +54,7 @@ const PRODUCTS = [
     name: 'Yellow Mustard Cold Pressed Oil',
     badge: null,
     icon: '🏺',
-    image: 'https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?q=80&w=800',
+    image: '/mustardoil.png',
     variants: [
       { label: '1 Ltr (Glass Bottle)', price: 340 },
       { label: '2.5 Ltr (Dolchi Pack)', price: 800 },
@@ -68,7 +68,7 @@ const PRODUCTS = [
     name: 'Black Mustard Cold Pressed Oil',
     badge: null,
     icon: '🫙',
-    image: 'https://images.unsplash.com/photo-1604908554027-6b5f7c4f1c2d?q=80&w=800',
+    image: 'blackmustardoil.png',
     variants: [
       { label: '1 Ltr', price: 280 },
       { label: '2.5 Ltr', price: 650 },
@@ -82,7 +82,7 @@ const PRODUCTS = [
     name: 'Pure Desi Butter (White)',
     badge: 'FRESH',
     icon: '🧈',
-    image: 'https://images.unsplash.com/photo-1589987607627-3e0f0a9a8c4b?q=80&w=800',
+    image: 'whitebutter.png',
     variants: [
       { label: '100 gm (Box Pack)', price: 150 },
       { label: '250 gm (Box Pack)', price: 300 },
@@ -97,7 +97,7 @@ const PRODUCTS = [
     name: 'Fresh Desi Paneer',
     badge: 'FRESH',
     icon: '🥛',
-    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?q=80&w=800',
+    image: 'paneer.png',
     variants: [
       { label: '500 gm (Poly Pack)', price: 260 },
       { label: '1 Kg (Poly Pack)', price: 470 },

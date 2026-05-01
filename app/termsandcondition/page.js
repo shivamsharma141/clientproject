@@ -1,3 +1,4 @@
+import Footer from "../component/Footer";
 import styles from "./terms.module.css";
 
 export const metadata = {
@@ -8,6 +9,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
+    <>
     <div className={styles.wrapper}>
       <div className={styles.container}>
 
@@ -240,5 +242,11 @@ export default function TermsPage() {
 
       </div>
     </div>
+
+   <Footer />
+  
+
+    </>
+
   );
 }

@@ -1,3 +1,4 @@
+import Footer from "../component/Footer";
 import styles from "./story.module.css";
 
 export const metadata = {
@@ -200,6 +201,16 @@ export default function StoryPage() {
         </a>
       </section>
 
+     {/* {the footer is starts from here} */}
+
+     <Footer />
+
+
+
     </main>
+
+  //  {the footer is starts from here}
+  
+  
   );
 }

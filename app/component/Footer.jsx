@@ -100,9 +100,8 @@ const PRODUCTS = [
 ];
 
 const COMPANY = [
-  { label: 'Our Story',   icon: <BookIcon />, href: '#story'   },
-  { label: 'Contact Us',  icon: <MailIcon />, href: '#contact' },
-  { label: 'My Orders',   icon: <BoxIcon />,  href: '#orders'  },
+  { label: 'Our Story',   icon: <BookIcon />, href: '/ourstory'   },
+  { label: 'Contact Us',  icon: <MailIcon />, href: '/contact' },
 ];
 
 export default function Footer() {

@@ -19,7 +19,7 @@ const NAV_LINKS = [
   { label: "Our Story", href: "/ourstory" },
   { label: "Contact", href: "/contact" },
   { label: "Terms & Conditions", href: "/termsandcondition" },
-  { label: "Refund Policy", href: "/refund" },
+  { label: "Refund Policy", href: "/refund" }, 
 ];
 
 export default function Nav() {

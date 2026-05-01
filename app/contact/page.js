@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import styles from "./contact.module.css";
+import Footer from "../component/Footer";
 
 const IconLocation = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -87,11 +88,42 @@ export default function ContactPage() {
   const [openFaq, setOpenFaq] = useState(null);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-  const handleSubmit = () => {
-    if (formData.name && formData.email && formData.message) setSubmitted(true);
-  };
+  const handleSubmit = async () => {
+  if (!formData.name || !formData.email || !formData.message) {
+    alert("Please fill all required fields");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setSubmitted(true);
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        message: "",
+      });
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
+  }
+};
 
   return (
+    <main>
     <div className={styles.contactPage}>
       {/* Decorative background blobs */}
       <div className={styles.blobTop} />
@@ -252,5 +284,10 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+
+    // {/* {the footer is starts from here} */}
+     <Footer />
+
+     </main>
   );
 }

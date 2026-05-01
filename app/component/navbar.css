@@ -63,7 +63,7 @@
   text-decoration: none;
   flex-shrink: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .nav__logo-brand {
@@ -337,7 +337,7 @@
   flex-shrink: 0;
 }
 
-.nav__drawer-logo {
+.nav__drawer-header a {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
   font-size: 1.45rem;
@@ -348,20 +348,30 @@
   line-height: 1;
 }
 
-.nav__drawer-close {
-  background: none; border: none;
-  cursor: pointer;
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text-light);
-  font-size: 1rem;
-  transition: background 0.2s, color 0.2s;
-  flex-shrink: 0;
-}
-.nav__drawer-close:hover {
+/* ── Cross / Close Button ── */
+.nav__drawer-header button {
   background: var(--green-pale);
+  border: 1.5px solid rgba(74, 158, 106, 0.25);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--green-deep);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.nav__drawer-header button:hover {
+  background: #d4eddb;
+  border-color: var(--green-light);
+  color: var(--green-deep);
+  transform: rotate(90deg);
 }
 
 /* Drawer Nav Links */
@@ -616,28 +626,36 @@
   }
 }
 
-/* Small phones (≤400px) */
+/* ── 330px tak "by Yashoda Dairy Farm" visible rakho ── */
+@media (max-width: 480px) {
+  .nav__logo-brand { font-size: 1.6rem; letter-spacing: 0.15em; }
+  .nav__logo-sub   { font-size: 0.6rem; }
+}
+
 @media (max-width: 400px) {
-  .nav__logo-brand   { font-size: 1.5rem; }
-  .nav__logo-sub     { font-size: 0.58rem; }
-  .nav__logo-divider { display: none; }
+  .nav__logo-brand   { font-size: 1.45rem; letter-spacing: 0.12em; }
+  .nav__logo-sub     { font-size: 0.56rem; letter-spacing: 0.06em; }
+  .nav__logo-divider { width: 1px; height: 10px; }
   .login-modal       { padding: 32px 22px 26px; }
   :root { --drawer-width: 260px; }
 }
 
-/* Very small phones (≤360px) */
+/* 330px — sub text still visible, just smaller */
 @media (max-width: 360px) {
   .nav {
     padding: 0 12px;
     height: 60px;
   }
+  .nav__logo { gap: 5px; }
   .nav__logo-brand {
-    font-size: 1.3rem;
-    letter-spacing: 0.15em;
+    font-size: 1.25rem;
+    letter-spacing: 0.1em;
   }
-  .nav__logo-sub,
-  .nav__logo-divider {
-    display: none;
+  .nav__logo-divider { height: 10px; }
+  .nav__logo-sub {
+    font-size: 0.5rem;
+    letter-spacing: 0.04em;
+    /* still visible — no display:none */
   }
   :root { --drawer-width: 240px; }
   .login-modal {
@@ -647,29 +665,29 @@
   .login-modal__brand { font-size: 1.4rem; }
   .login-modal__input { padding: 8px 10px; font-size: 0.82rem; }
   .nav__drawer-header { padding: 16px 16px 14px 20px; }
-  .nav__drawer-logo   { font-size: 1.2rem; }
+  .nav__drawer-header a { font-size: 1.2rem; }
   .nav__drawer-link   { padding: 14px 16px 14px 20px; font-size: 0.8rem; }
   .nav__drawer-footer { padding: 14px 16px; }
 }
 
 /* Tiny phones (≤320px) */
 @media (max-width: 320px) {
-  .nav {
-    padding: 0 10px;
-  }
+  .nav { padding: 0 10px; }
+  .nav__logo { gap: 4px; }
   .nav__logo-brand {
-    font-size: 1.15rem;
-    letter-spacing: 0.1em;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+  }
+  .nav__logo-divider { display: none; }
+  .nav__logo-sub {
+    font-size: 0.46rem;
+    letter-spacing: 0.03em;
   }
   :root { --drawer-width: 220px; }
-  .nav__cart {
-    padding: 6px 7px;
-  }
-  .nav__cart-icon { width: 18px; height: 18px; }
-  .nav__hamburger { padding: 6px; }
-  .login-modal {
-    padding: 24px 14px 20px;
-  }
+  .nav__cart        { padding: 6px 7px; }
+  .nav__cart-icon   { width: 18px; height: 18px; }
+  .nav__hamburger   { padding: 6px; }
+  .login-modal      { padding: 24px 14px 20px; }
   .login-modal__brand { font-size: 1.2rem; letter-spacing: 0.15em; }
   .login-modal__sub   { font-size: 0.6rem; }
   .login-modal__title { font-size: 0.7rem; margin-bottom: 18px; }
