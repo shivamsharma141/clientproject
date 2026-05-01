@@ -40,8 +40,8 @@ const steps = [
   },
   {
     num: "06",
-    title: "Delivered to Your Home",
-    desc: "From our farm kitchen directly to your doorstep — our ghee, fresh paneer, butter, and oils are packed with care and delivered so you taste the difference in every drop.",
+    title: "Delivered to Your Home ",
+    desc: "From our farm kitchen directly to your doorstep — our ghee, fresh paneer, butter, and oils are packed with care and delivered so you taste the difference in every drop with care.",
     img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80&fit=crop",
   },
 ];
