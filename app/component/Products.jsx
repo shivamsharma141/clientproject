@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import styles from './product.module.css';
 import { useCart } from '../component/Cartcontext.js';
 
-// ── TABS ARRAY (IMPORTANT - Ye chahiye) ───────────────────────
+// ── TABS ARRAY ─────────────────────────────────────────────────
 const TABS = [
   { key: 'all', label: 'All Products' },
   { key: 'ghee', label: 'Ghee' },
@@ -13,7 +13,7 @@ const TABS = [
   { key: 'paneer', label: 'Paneer' },
 ];
 
-// ── PRODUCTS WITH IMAGES (Unsplash URLs) ──────────────────────
+// ── PRODUCTS ───────────────────────────────────────────────────
 const PRODUCTS = [
   {
     id: 'ghee-a2',
@@ -105,7 +105,20 @@ const PRODUCTS = [
   },
 ];
 
-// ── Login Required Toast ──────────────────────────────────────
+// ── DISCOUNT HELPERS ───────────────────────────────────────────
+// Sirf GHEE products pe 15% discount hai.
+// Ghee me bhi 250ml aur 500ml variants pe koi discount nahi.
+// Oil, Butter, Paneer pe koi discount nahi.
+const isExcludedFromDiscount = (label) =>
+  label.startsWith('250') || label.startsWith('500');
+
+const getDiscountedPrice = (label, price, category) => {
+  if (category !== 'ghee') return null;              // only ghee gets discount
+  if (isExcludedFromDiscount(label)) return null;    // 250ml & 500ml excluded
+  return Math.round(price * 0.85);                   // 15% off
+};
+
+// ── Login Required Toast ───────────────────────────────────────
 function LoginToast({ onClose, onLogin }) {
   return (
     <div className={styles.toastOverlay} onClick={onClose}>
@@ -134,7 +147,7 @@ function LoginToast({ onClose, onLogin }) {
   );
 }
 
-// ── Product Card ──────────────────────────────────────────────
+// ── Product Card ───────────────────────────────────────────────
 function ProductCard({ product, onLoginRequired }) {
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [added, setAdded] = useState(false);
@@ -159,11 +172,15 @@ function ProductCard({ product, onLoginRequired }) {
 
       addToCart(product, selectedVariant);
       router.push('/checkout');
-
     } catch {
       onLoginRequired();
     }
   };
+
+  const selectedV = product.variants[selectedVariant];
+
+  // Pass product.category so discount only applies to ghee
+  const selectedDisc = getDiscountedPrice(selectedV.label, selectedV.price, product.category);
 
   return (
     <div className={styles.card}>
@@ -171,6 +188,11 @@ function ProductCard({ product, onLoginRequired }) {
         <div className={`${styles.badge} ${styles[`badge${product.badge}`]}`}>
           {product.badge}
         </div>
+      )}
+
+      {/* 15% OFF tag — only shows on ghee cards */}
+      {product.category === 'ghee' && (
+        <div className={styles.discountTag}>15% OFF</div>
       )}
 
       <div className={styles.cardImg}>
@@ -190,28 +212,66 @@ function ProductCard({ product, onLoginRequired }) {
         <p className={styles.cardType}>{product.categoryLabel}</p>
         <h3 className={styles.cardName}>{product.name}</h3>
 
+        {/* Ghee discount note below product name */}
+        {product.category === 'ghee' && (
+          <p className={styles.discountNote}>
+             15% discount on 1 Ltr & above variants
+          </p>
+        )}
+
         <div className={styles.variantList}>
-          {product.variants.map((v, i) => (
-            <button
-              key={i}
-              className={`${styles.variantRow} ${selectedVariant === i ? styles.variantSelected : ''}`}
-              onClick={() => setSelectedVariant(i)}
-            >
-              <span className={styles.variantLabel}>{v.label}</span>
-              <span className={styles.variantPrice}>
-                <span className={styles.rupee}>₹</span>
-                {v.price.toLocaleString('en-IN')}
-              </span>
-            </button>
-          ))}
+          {product.variants.map((v, i) => {
+            // Pass product.category — discount only on ghee
+            const disc = getDiscountedPrice(v.label, v.price, product.category);
+            return (
+              <button
+                key={i}
+                className={`${styles.variantRow} ${selectedVariant === i ? styles.variantSelected : ''}`}
+                onClick={() => setSelectedVariant(i)}
+              >
+                <span className={styles.variantLabel}>{v.label}</span>
+                <span className={styles.variantPriceWrap}>
+                  {disc ? (
+                    <>
+                      <span className={styles.originalPrice}>
+                        ₹{v.price.toLocaleString('en-IN')}
+                      </span>
+                      <span className={styles.variantPrice}>
+                        <span className={styles.rupee}>₹</span>
+                        {disc.toLocaleString('en-IN')}
+                      </span>
+                    </>
+                  ) : (
+                    <span className={styles.variantPrice}>
+                      <span className={styles.rupee}>₹</span>
+                      {v.price.toLocaleString('en-IN')}
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       <div className={styles.cardFooter}>
         <div className={styles.selectedInfo}>
-          <span className={styles.selectedLabel}>{product.variants[selectedVariant].label}</span>
-          <span className={styles.selectedPrice}>
-            ₹{product.variants[selectedVariant].price.toLocaleString('en-IN')}
+          <span className={styles.selectedLabel}>{selectedV.label}</span>
+          <span className={styles.selectedPriceWrap}>
+            {selectedDisc ? (
+              <>
+                <span className={styles.originalPriceLg}>
+                  ₹{selectedV.price.toLocaleString('en-IN')}
+                </span>
+                <span className={styles.selectedPrice}>
+                  ₹{selectedDisc.toLocaleString('en-IN')}
+                </span>
+              </>
+            ) : (
+              <span className={styles.selectedPrice}>
+                ₹{selectedV.price.toLocaleString('en-IN')}
+              </span>
+            )}
           </span>
         </div>
 
@@ -242,7 +302,7 @@ function ProductCard({ product, onLoginRequired }) {
   );
 }
 
-// ── Main Products Page ────────────────────────────────────────
+// ── Main Products Page ─────────────────────────────────────────
 export default function Products() {
   const [activeTab, setActiveTab] = useState('all');
   const [showLoginToast, setShowLoginToast] = useState(false);
@@ -277,6 +337,11 @@ export default function Products() {
         From the purest A2 bilona ghee to fresh paneer — each product made
         with care, tradition, and zero compromise.
       </p>
+
+      {/* Ghee discount announcement banner */}
+      <div className={styles.discountBanner}>
+        🧈 Special Offer: Get <strong>15% OFF</strong> on all Ghee products (1 Ltr & above)!
+      </div>
 
       <div className={styles.tabs}>
         {TABS.map(t => (

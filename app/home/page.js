@@ -100,7 +100,7 @@ export default function Home() {
               <a href="#products" onClick={scrollToProducts} className={styles.btnPrimary}>
                 Shop Now &rarr;
               </a>
-              <a href="#story" className={styles.btnSecondary}>
+              <a href="/ourstory" className={styles.btnSecondary}>
                 Our Story &nbsp;↗
               </a>
             </div>
