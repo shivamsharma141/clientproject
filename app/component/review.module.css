@@ -1,0 +1,370 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --green:  #3c9c6b;
+  --mid:    #2d6a4f;
+  --gold:   #c9a227;
+  --pale:   #f5e6b3;
+  --cream:  #faf6ee;
+  --cream2: #f0e8d6;
+  --text:   #1c1c1c;
+  --muted:  #5a5a5a;
+  --faint:  #999;
+  --white:  #ffffff;
+}
+
+/* ── Section ─────────────────────── */
+.section {
+  position: relative;
+  background: var(--cream);
+  padding: 52px 16px 48px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.blob1 {
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 340px; height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,162,39,.12) 0%, transparent 68%);
+  pointer-events: none;
+}
+.blob2 {
+  position: absolute;
+  bottom: -60px; left: -60px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(26,61,43,.08) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+/* ── Header ──────────────────────── */
+.header {
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto 24px;
+}
+
+.pill {
+  display: inline-block;
+  background: var(--green);
+  color: var(--pale);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+}
+
+.heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 4vw, 38px);
+  font-weight: 600;
+  color: var(--green);
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+.heading em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+  letter-spacing: .2px;
+}
+
+/* ── Carousel ────────────────────── */
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 860px;
+  margin: 0 auto;
+  /* height is driven by card content — no fixed height */
+  min-height: 280px;
+}
+
+.track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: grab;
+}
+.track:active { cursor: grabbing; }
+
+.slot {
+  position: absolute;
+  width: 380px;
+  max-width: calc(100vw - 72px);
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Card ────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: 18px;
+  border: 1.5px solid rgba(201,162,39,.2);
+  box-shadow: 0 6px 24px rgba(26,61,43,.09);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+}
+
+.cardActive {
+  box-shadow:
+    0 20px 60px rgba(26,61,43,.16),
+    0 0 0 2px rgba(201,162,39,.28);
+}
+
+/* ── Body ────────────────────────── */
+.body {
+  padding: 20px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Meta Row */
+.topMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.verifiedTag {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--mid);
+  background: rgba(45,106,79,.1);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.dateText {
+  font-size: 10.5px;
+  color: var(--faint);
+  font-weight: 400;
+}
+
+/* Product */
+.productLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  margin: 0 0 6px;
+  letter-spacing: .2px;
+}
+
+/* Stars */
+.stars {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.on  { color: var(--gold); font-size: 15px; line-height: 1; }
+.off { color: #ddd;         font-size: 15px; line-height: 1; }
+
+/* Review text — full visible, no clamp */
+.reviewText {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 14px;
+}
+
+.hr {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--cream2), transparent);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+/* ── User Row ────────────────────── */
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatarInitials {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--mid));
+  color: var(--pale);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  border: 2.5px solid var(--gold);
+  letter-spacing: .5px;
+}
+
+.checkBadge {
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 15px; height: 15px;
+  background: var(--mid);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7.5px;
+  font-weight: 700;
+  border: 1.5px solid #fff;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.location {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* ── Arrows ──────────────────────── */
+.arrow {
+  position: absolute;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1.5px solid rgba(26,61,43,.15);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all .22s ease;
+  box-shadow: 0 3px 10px rgba(26,61,43,.1);
+  flex-shrink: 0;
+}
+.arrow:hover {
+  background: var(--green);
+  color: #e8b84b;
+  border-color: var(--green);
+  transform: scale(1.1);
+}
+.arrowL { left: 0; }
+.arrowR { right: 0; }
+
+/* ── Dots ────────────────────────── */
+.dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 22px;
+}
+
+.dot {
+  width: 7px; height: 7px;
+  border-radius: 100px;
+  background: var(--cream2);
+  border: 1.5px solid #4a9468;
+  cursor: pointer;
+  padding: 0;
+  transition: all .25s ease;
+}
+.dotOn {
+  width: 24px;
+  background: var(--green);
+  border-color: var(--green);
+}
+
+/* ── Responsive ──────────────────── */
+@media (max-width: 640px) {
+  .section {
+    padding: 40px 12px 40px;
+  }
+
+  .header {
+    margin-bottom: 20px;
+  }
+
+  .carousel {
+    min-height: 260px;
+  }
+
+  .track {
+    min-height: 260px;
+  }
+
+  .slot {
+    width: calc(100vw - 64px);
+    max-width: 100%;
+  }
+
+  .body {
+    padding: 16px 16px 15px;
+  }
+
+  .reviewText {
+    font-size: 12.5px;
+  }
+
+  .arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .arrowL { left: -2px; }
+  .arrowR { right: -2px; }
+}
+
+@media (max-width: 400px) {
+  .slot {
+    width: calc(100vw - 56px);
+  }
+
+  .body {
+    padding: 14px 13px 13px;
+  }
+
+  .heading {
+    font-size: 22px;
+  }
+
+  .reviewText {
+    font-size: 12px;
+  }
+
+  .avatarInitials {
+    width: 38px;
+    height: 38px;
+    font-size: 12px;
+  }
+}

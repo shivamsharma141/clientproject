@@ -5,6 +5,7 @@ import styles from './home.module.css';
 import Products from '../component/Products.jsx';
 import Getintouch from '../component/Getintouch.jsx';
 import Footer from '../component/Footer';
+import ReviewSection from '../component/Reviews';
 
 const MARQUEE_ITEMS = [
   'A2 Desi Cow Ghee', 'Bilona Method', 'Farm Fresh Paneer',
@@ -181,9 +182,14 @@ export default function Home() {
 
       {/* ── Get in Touch ── */}
       <Getintouch />
+       {/* review */}
+      <ReviewSection></ReviewSection>
 
       {/* ── Footer ── */}
       <Footer />
+
+
+
 
       {/* ── WhatsApp Floating Button ── */}
       <button 
