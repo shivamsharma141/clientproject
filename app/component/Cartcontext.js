@@ -9,6 +9,16 @@ import React, {
 
 const CartContext = createContext(null);
 
+// ── Discount Helpers ───────────────────────────────────────────
+const isExcludedFromDiscount = (label) =>
+  label.startsWith('250') || label.startsWith('500');
+
+const getDiscountedPrice = (label, price, category) => {
+  if (category !== 'ghee') return null;
+  if (isExcludedFromDiscount(label)) return null;
+  return Math.round(price * 0.85);
+};
+
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [hydrated, setHydrated] = useState(false);
@@ -43,6 +53,11 @@ export function CartProvider({ children }) {
     // ✅ Unique item ID (product + variant)
     const itemId = `${product.id}-${variantIndex}`;
 
+    // ✅ Discounted price agar applicable ho, warna original
+    const finalPrice =
+      getDiscountedPrice(variant.label, variant.price, product.category) ??
+      variant.price;
+
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.itemId === itemId);
 
@@ -55,7 +70,7 @@ export function CartProvider({ children }) {
         );
       }
 
-      // ✅ Add new item
+      // ✅ Add new item with discounted price
       return [
         ...prev,
         {
@@ -64,9 +79,10 @@ export function CartProvider({ children }) {
           name: product.name,
           categoryLabel: product.categoryLabel,
           icon: product.icon || null,
-          image: product.image || null, // ✅ Image stored here
+          image: product.image || null,
           variantLabel: variant.label,
-          price: variant.price,
+          price: finalPrice,        // ✅ Discounted price store hogi
+          originalPrice: variant.price, // ✅ Original price bhi save (optional, useful for display)
           quantity: 1,
         },
       ];
@@ -99,7 +115,7 @@ export function CartProvider({ children }) {
     0
   );
 
-  // ✅ Total Price
+  // ✅ Total Price (discounted price pe calculate hoga)
   const cartTotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
