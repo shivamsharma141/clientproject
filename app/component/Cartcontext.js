@@ -1,4 +1,5 @@
 "use client";
+
 import React, {
   createContext,
   useContext,
@@ -9,34 +10,28 @@ import React, {
 
 const CartContext = createContext(null);
 
-// ── Discount Helpers ───────────────────────────────────────────
-const isExcludedFromDiscount = (label) =>
-  label.startsWith('250') || label.startsWith('500');
-
-const getDiscountedPrice = (label, price, category) => {
-  if (category !== 'ghee') return null;
-  if (isExcludedFromDiscount(label)) return null;
-  return Math.round(price * 0.85);
+const PROMO_CODES = {
+  GAAV15: 15,
 };
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [hydrated, setHydrated] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
 
-  // ✅ Load cart from localStorage
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem("gaav_cart");
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-      }
+      if (savedCart) setCartItems(JSON.parse(savedCart));
     } catch (error) {
       console.error("Cart load error:", error);
     }
     setHydrated(true);
   }, []);
 
-  // ✅ Save cart to localStorage
   useEffect(() => {
     if (!hydrated) return;
     try {
@@ -46,31 +41,19 @@ export function CartProvider({ children }) {
     }
   }, [cartItems, hydrated]);
 
-  // ✅ Add to Cart
   const addToCart = useCallback((product, variantIndex) => {
     const variant = product.variants[variantIndex];
-
-    // ✅ Unique item ID (product + variant)
     const itemId = `${product.id}-${variantIndex}`;
-
-    // ✅ Discounted price agar applicable ho, warna original
-    const finalPrice =
-      getDiscountedPrice(variant.label, variant.price, product.category) ??
-      variant.price;
 
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.itemId === itemId);
-
       if (existingItem) {
-        // ✅ Increase quantity if already exists
         return prev.map((item) =>
           item.itemId === itemId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-
-      // ✅ Add new item with discounted price
       return [
         ...prev,
         {
@@ -81,22 +64,17 @@ export function CartProvider({ children }) {
           icon: product.icon || null,
           image: product.image || null,
           variantLabel: variant.label,
-          price: finalPrice,        // ✅ Discounted price store hogi
-          originalPrice: variant.price, // ✅ Original price bhi save (optional, useful for display)
+          price: variant.price,
           quantity: 1,
         },
       ];
     });
   }, []);
 
-  // ✅ Remove item
   const removeFromCart = useCallback((itemId) => {
-    setCartItems((prev) =>
-      prev.filter((item) => item.itemId !== itemId)
-    );
+    setCartItems((prev) => prev.filter((item) => item.itemId !== itemId));
   }, []);
 
-  // ✅ Update quantity
   const updateQuantity = useCallback((itemId, delta) => {
     setCartItems((prev) =>
       prev
@@ -109,17 +87,39 @@ export function CartProvider({ children }) {
     );
   }, []);
 
-  // ✅ Total Count
-  const cartCount = cartItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const applyPromoCode = useCallback((code) => {
+    const upper = code.trim().toUpperCase();
+    if (PROMO_CODES[upper] !== undefined) {
+      setPromoCode(upper);
+      setPromoDiscount(PROMO_CODES[upper]);
+      setPromoApplied(true);
+      setPromoError("");
+    } else {
+      setPromoError("Invalid promo code. Try GAAV15.");
+      setPromoApplied(false);
+      setPromoDiscount(0);
+    }
+  }, []);
 
-  // ✅ Total Price (discounted price pe calculate hoga)
-  const cartTotal = cartItems.reduce(
+  const removePromoCode = useCallback(() => {
+    setPromoCode("");
+    setPromoDiscount(0);
+    setPromoApplied(false);
+    setPromoError("");
+  }, []);
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const cartSubtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const discountAmount = promoApplied
+    ? Math.round(cartSubtotal * promoDiscount / 100)
+    : 0;
+
+  const cartTotal = cartSubtotal - discountAmount;
 
   return (
     <CartContext.Provider
@@ -129,7 +129,15 @@ export function CartProvider({ children }) {
         removeFromCart,
         updateQuantity,
         cartCount,
+        cartSubtotal,
         cartTotal,
+        discountAmount,
+        promoCode,
+        promoDiscount,
+        promoApplied,
+        promoError,
+        applyPromoCode,
+        removePromoCode,
       }}
     >
       {children}

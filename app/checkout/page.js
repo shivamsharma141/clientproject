@@ -5,13 +5,9 @@ import { useRouter } from "next/navigation";
 import { useCart } from "../component/Cartcontext.js";
 import styles from "./checkout.module.css";
 
-// ─────────────────────────────────────────────
-//  🔧 CONFIG — edit these 3 lines only
-// ─────────────────────────────────────────────
 const UPI_ID          = "7982706406@pthdfc";
 const MERCHANT_NAME   = "Yashodha Dairy Farmin";
 const WHATSAPP_NUMBER = "918506000615";
-// ─────────────────────────────────────────────
 
 const DELHI_KEYWORDS = [
   "delhi","new delhi","north delhi","south delhi",
@@ -37,25 +33,28 @@ function buildUpiUrl(amount, orderId) {
   return `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(MERCHANT_NAME)}&am=${amount}&cu=INR&tn=${note}`;
 }
 
-// ── tiny SVG icons ─────────────────────────────────────────────────────────
+// ── SVG Icons ──────────────────────────────────────────────────
 const IconCheck = () => (
   <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
     <circle cx="7.5" cy="7.5" r="7.5" fill="#22c55e" />
     <path d="M4 7.5l2.5 2.5 4.5-5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
 const IconWarn = () => (
   <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
     <circle cx="6.5" cy="6.5" r="6" stroke="#ef4444" strokeWidth="1.3" />
     <path d="M6.5 4v3M6.5 9h.01" stroke="#ef4444" strokeWidth="1.3" strokeLinecap="round" />
   </svg>
 );
+
 const IconUPI = () => (
   <svg width="32" height="32" viewBox="0 0 48 48">
     <rect width="48" height="48" rx="10" fill="#1a1a2e" />
     <text x="24" y="31" textAnchor="middle" fill="#f0b429" fontSize="15" fontWeight="800" fontFamily="Georgia,serif">UPI</text>
   </svg>
 );
+
 const IconCOD = () => (
   <svg width="32" height="32" viewBox="0 0 48 48">
     <rect width="48" height="48" rx="10" fill="#78350f" />
@@ -63,6 +62,7 @@ const IconCOD = () => (
     <path d="M24 17v14M18 24h12" stroke="#fbbf24" strokeWidth="2.2" strokeLinecap="round" />
   </svg>
 );
+
 const IconWA = () => (
   <svg width="19" height="19" viewBox="0 0 32 32">
     <circle cx="16" cy="16" r="16" fill="#25D366" />
@@ -70,13 +70,64 @@ const IconWA = () => (
     <path d="M20.5 18.9c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.1l-.8.9c-.1.2-.3.2-.5.1a7.5 7.5 0 0 1-3.8-3.3c-.1-.3 0-.4.2-.6l.5-.6.2-.4-1-2.3c-.3-.6-.5-.5-.7-.5h-.5c-.2 0-.5.1-.7.3a3.6 3.6 0 0 0-1.1 2.7c0 1.6 1.1 3.1 1.2 3.3.2.2 2.2 3.4 5.4 4.7.8.3 1.4.5 1.8.6.8.2 1.5.2 2 .1.6-.1 1.9-.8 2.1-1.5.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z" fill="#25D366" />
   </svg>
 );
+
 const IconArrow = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-// ── Reusable warning banner ────────────────────────────────────────────────
+const IconUser = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+  </svg>
+);
+
+const IconLocation = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+    <circle cx="12" cy="9" r="2.5" />
+  </svg>
+);
+
+const IconCard = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <path d="M2 10h20" />
+  </svg>
+);
+
+const IconAlert = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a5800" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const IconScan = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+    <line x1="3" y1="12" x2="21" y2="12" />
+  </svg>
+);
+
+const IconParty = () => (
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 2L11 13" />
+    <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+  </svg>
+);
+
+const IconOrderId = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 11l3 3L22 4" />
+    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+  </svg>
+);
+
+// ── Warning Banner ─────────────────────────────────────────────
 function WaBanner({ text }) {
   return (
     <div style={{
@@ -84,13 +135,13 @@ function WaBanner({ text }) {
       padding: "11px 16px", fontSize: "0.78rem", color: "#7a5800",
       lineHeight: 1.7, display: "flex", gap: 9, alignItems: "flex-start",
     }}>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>⚠️</span>
+      <span style={{ flexShrink: 0, marginTop: 1 }}><IconAlert /></span>
       <span dangerouslySetInnerHTML={{ __html: text }} />
     </div>
   );
 }
 
-// ── QR Modal (desktop only) ────────────────────────────────────────────────
+// ── UPI QR Modal ───────────────────────────────────────────────
 function UpiModal({ upiUrl, amount, onClose }) {
   const canvasRef = useRef(null);
 
@@ -122,25 +173,23 @@ function UpiModal({ upiUrl, amount, onClose }) {
           textAlign: "center", maxWidth: 300, width: "90%",
         }}
       >
-        <div style={{ fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8a7a6a", marginBottom: 4 }}>
-          Scan to Pay
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginBottom: 4 }}>
+          <IconScan />
+          <div style={{ fontSize: "0.68rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8a7a6a" }}>
+            Scan to Pay
+          </div>
         </div>
         <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#1a2e1b", marginBottom: 18 }}>
           ₹{amount.toLocaleString("en-IN")}
         </div>
-
         <canvas ref={canvasRef} style={{ borderRadius: 10, display: "block", margin: "0 auto" }} />
-
         <p style={{ fontSize: "0.78rem", color: "#9a8a78", marginTop: 16, lineHeight: 1.6, marginBottom: 4 }}>
           Scan with GPay, PhonePe, Paytm or any UPI app
         </p>
         <div style={{ fontSize: "0.7rem", color: "#bbb", wordBreak: "break-all", marginBottom: 14 }}>
           {UPI_ID}
         </div>
-
-        {/* ⚠️ Note inside QR modal */}
         <WaBanner text="<strong>Your order will only be confirmed after you send a WhatsApp message.</strong> Please do not skip that step after closing this." />
-
         <button
           onClick={onClose}
           style={{
@@ -159,7 +208,14 @@ function UpiModal({ upiUrl, amount, onClose }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, cartTotal } = useCart();
+  const {
+    cartItems,
+    cartSubtotal,
+    cartTotal,
+    discountAmount,
+    promoApplied,
+    promoCode,
+  } = useCart();
 
   const [form, setForm] = useState({
     fullName: "", phone: "", email: "",
@@ -223,6 +279,9 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           ...form,
           items: cartItems,
+          subtotal: cartSubtotal,
+          discountAmount,
+          promoCode: promoApplied ? promoCode : null,
           total: cartTotal,
           paymentMethod: payMethod.toUpperCase(),
           status: payMethod === "cod" ? "confirmed" : "pending_payment",
@@ -263,16 +322,21 @@ export default function CheckoutPage() {
     const lines = cartItems
       .map((i) => `  • ${i.name} ×${i.quantity}  ₹${(i.price * i.quantity).toLocaleString("en-IN")}`)
       .join("\n");
+    const promoLine = promoApplied
+      ? `Promo Code: ${promoCode} (−₹${discountAmount.toLocaleString("en-IN")})\n`
+      : "";
     const msg =
-      `🛍️ *Order Confirmation*\n` +
-      `Order ID: *#${orderId}*\n\n` +
-      `👤 *${form.fullName}*\n` +
-      `📞 ${form.phone}\n` +
-      `📍 ${form.address}, ${form.city} – ${form.pincode}\n\n` +
-      `*Items:*\n${lines}\n\n` +
-      `💰 *Total: ₹${cartTotal.toLocaleString("en-IN")}*\n` +
-      `💳 Payment: ${payMethod === "cod" ? "Cash on Delivery" : "UPI"}\n\n` +
-      `✅ Please confirm my order!`;
+      `Order Confirmation\n` +
+      `Order ID: #${orderId}\n\n` +
+      `${form.fullName}\n` +
+      `Phone: ${form.phone}\n` +
+      `Address: ${form.address}, ${form.city} – ${form.pincode}\n\n` +
+      `Items:\n${lines}\n\n` +
+      `Subtotal: ₹${cartSubtotal.toLocaleString("en-IN")}\n` +
+      promoLine +
+      `Total: ₹${cartTotal.toLocaleString("en-IN")}\n` +
+      `Payment: ${payMethod === "cod" ? "Cash on Delivery" : "UPI"}\n\n` +
+      `Please confirm my order.`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -282,7 +346,7 @@ export default function CheckoutPage() {
     <div className={styles.page}>
       <div className={styles.container}>
 
-        {/* ── PROGRESS BAR ── */}
+        {/* Progress Bar */}
         <div className={styles.progress}>
           {["Details", "Review", "Payment"].map((label, i) => {
             const idx = ["form","review","done"].indexOf(step);
@@ -302,20 +366,19 @@ export default function CheckoutPage() {
 
         <h1 className={styles.title}>Checkout</h1>
 
-        {/* ⚠️ Top-level global notice on all steps */}
         <div style={{ marginBottom: 24 }}>
           <WaBanner text="<strong>Your order will only be confirmed after you send a WhatsApp message.</strong> After placing your order, tap <strong>'Confirm Order on WhatsApp'</strong> — without this step your order will not be processed." />
         </div>
 
-        {/* ════════════════════════════════════════
-            STEP 1 — FORM
-        ════════════════════════════════════════ */}
+        {/* ════ STEP 1 — FORM ════ */}
         {step === "form" && (
           <div className={styles.grid}>
             <div className={styles.left}>
 
               <section className={styles.card}>
-                <h2 className={styles.cardTitle}><span>👤</span> Customer Details</h2>
+                <h2 className={styles.cardTitle}>
+                  <IconUser /> Customer Details
+                </h2>
 
                 <F label="Full Name" required err={errOf("fullName")}>
                   <I name="fullName" placeholder="Your full name" value={form.fullName}
@@ -341,7 +404,9 @@ export default function CheckoutPage() {
               </section>
 
               <section className={styles.card}>
-                <h2 className={styles.cardTitle}><span>📍</span> Delivery Address</h2>
+                <h2 className={styles.cardTitle}>
+                  <IconLocation /> Delivery Address
+                </h2>
 
                 <F label="Full Address" required err={errOf("address")}>
                   <div className={styles.inputWrap}>
@@ -374,7 +439,9 @@ export default function CheckoutPage() {
 
               {formOk && (
                 <section className={`${styles.card} ${styles.cardAnimate}`}>
-                  <h2 className={styles.cardTitle}><span>💳</span> Payment Method</h2>
+                  <h2 className={styles.cardTitle}>
+                    <IconCard /> Payment Method
+                  </h2>
 
                   <div
                     className={`${styles.payOpt} ${payMethod === "upi" ? styles.payOptSelected : ""}`}
@@ -403,9 +470,8 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {/* ⚠️ Note below payment options */}
                   <p style={{ fontSize: "0.74rem", color: "#9a8a78", marginTop: 14, lineHeight: 1.6 }}>
-                    📌 After payment, you must confirm your order on WhatsApp. Your order is not final until we receive your WhatsApp message.
+                    After payment, you must confirm your order on WhatsApp. Your order is not final until we receive your WhatsApp message.
                   </p>
                 </section>
               )}
@@ -428,6 +494,27 @@ export default function CheckoutPage() {
                 ))}
 
                 <div className={styles.divider} />
+
+                <div className={styles.summaryItem}>
+                  <div><div className={styles.iName}>Subtotal</div></div>
+                  <div className={styles.iPrice}>₹{cartSubtotal.toLocaleString("en-IN")}</div>
+                </div>
+
+                {promoApplied && (
+                  <div className={styles.summaryItem}>
+                    <div>
+                      <div className={styles.iName} style={{ color: "#1d6b3f" }}>
+                        Promo: {promoCode}
+                      </div>
+                      <div className={styles.iQty}>15% discount applied</div>
+                    </div>
+                    <div className={styles.iPrice} style={{ color: "#1d6b3f" }}>
+                      − ₹{discountAmount.toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                )}
+
+                <div className={styles.divider} />
                 <div className={styles.totalRow}>
                   <span className={styles.totalLabel}>Total</span>
                   <span className={styles.totalAmt}>₹{cartTotal.toLocaleString("en-IN")}</span>
@@ -439,23 +526,20 @@ export default function CheckoutPage() {
 
                 {!formOk && <p className={styles.hint}>Please fill all required fields</p>}
 
-                {/* ⚠️ Note inside order summary */}
                 <p style={{ fontSize: "0.72rem", color: "#b0a090", marginTop: 14, textAlign: "center", lineHeight: 1.6 }}>
-                  ⚠️ Order confirmed only after WhatsApp message
+                  Order confirmed only after WhatsApp message
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* ════════════════════════════════════════
-            STEP 2 — REVIEW
-        ════════════════════════════════════════ */}
+        {/* ════ STEP 2 — REVIEW ════ */}
         {step === "review" && (
           <div className={styles.reviewWrap}>
             <div className={styles.reviewCard}>
               <h2 className={styles.reviewTitle}>Order Review</h2>
-              <p className={styles.reviewSub}>Please check everything before paying 👇</p>
+              <p className={styles.reviewSub}>Please check everything before paying</p>
 
               <div className={styles.reviewSection}>
                 <div className={styles.reviewSectionTitle}>Customer</div>
@@ -479,6 +563,12 @@ export default function CheckoutPage() {
                     v={`₹${(item.price * item.quantity).toLocaleString("en-IN")}`}
                   />
                 ))}
+                {promoApplied && (
+                  <Row
+                    k={`Promo (${promoCode})`}
+                    v={`− ₹${discountAmount.toLocaleString("en-IN")}`}
+                  />
+                )}
                 <div className={styles.reviewTotal}>
                   <span>Total</span>
                   <span>₹{cartTotal.toLocaleString("en-IN")}</span>
@@ -490,7 +580,6 @@ export default function CheckoutPage() {
                 <Row k="Method" v={payMethod === "cod" ? "Cash on Delivery" : "UPI"} />
               </div>
 
-              {/* ⚠️ Note on review page */}
               <div style={{ margin: "16px 0" }}>
                 <WaBanner text="<strong>Important:</strong> Your order will only be confirmed after you tap <strong>'Confirm on WhatsApp'</strong> below. Do not skip this step." />
               </div>
@@ -517,7 +606,7 @@ export default function CheckoutPage() {
                 )}
 
                 <button className={styles.waBtn} onClick={() => { handlePlaceOrder().then(openWhatsApp); }}>
-                  <IconWA /> Confirm on WhatsApp
+                  Confirm on WhatsApp
                 </button>
               </div>
 
@@ -528,20 +617,20 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* ════════════════════════════════════════
-            STEP 3 — DONE
-        ════════════════════════════════════════ */}
+        {/* ════ STEP 3 — DONE ════ */}
         {step === "done" && (
           <div className={styles.doneWrap}>
-            <div className={styles.doneIcon}>🎉</div>
+            <div className={styles.doneIcon}>
+              <IconParty />
+            </div>
             <h2 className={styles.doneTitle}>Order Placed!</h2>
             {savedOrder && (
               <div className={styles.doneId}>
+                <IconOrderId />
                 Order ID: <strong>#{savedOrder._id?.toString().slice(-6).toUpperCase()}</strong>
               </div>
             )}
 
-            {/* ⚠️ Big note on done screen */}
             <div style={{ maxWidth: 380, margin: "16px auto" }}>
               <WaBanner text={
                 payMethod === "upi"
@@ -551,15 +640,14 @@ export default function CheckoutPage() {
             </div>
 
             <button className={styles.waBtn} style={{ maxWidth: 320, margin: "0 auto" }} onClick={openWhatsApp}>
-              <IconWA /> Confirm Order on WhatsApp
+               Confirm Order on WhatsApp
             </button>
             <button className={styles.backBtn} onClick={() => router.push("/")}>
-              Go to Home →
+              Go to Home
             </button>
           </div>
         )}
 
-        {/* ── QR Modal — shows on desktop after UPI order ── */}
         {qrUrl && (
           <UpiModal
             upiUrl={qrUrl}
@@ -573,7 +661,7 @@ export default function CheckoutPage() {
   );
 }
 
-// ── tiny helpers ──────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────
 function F({ label, required, err, children }) {
   return (
     <div className="co-f" style={{ marginBottom: 16 }}>

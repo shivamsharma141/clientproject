@@ -703,3 +703,158 @@
   .toastIconCircle { width: 64px; height: 64px; }
   .toastTitle { font-size: 1.3rem; }
 }
+
+/* ── Promo Banner (top of cart page) ── */
+.promoBanner {
+  text-align: center;
+  background: linear-gradient(135deg, #fffbf0, #fff8e6);
+  border: 1.5px solid rgba(201, 168, 76, 0.45);
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: 14px;
+  color: #7a5c10;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+  box-shadow: 0 2px 12px rgba(201, 168, 76, 0.12);
+}
+
+.promoBanner strong {
+  color: #c9a84c;
+  font-weight: 700;
+}
+
+/* ── Promo Code Section ── */
+.promoSection {
+  padding: 14px 0 6px;
+}
+
+.promoInputRow {
+  display: flex;
+  gap: 8px;
+}
+
+.promoInput {
+  flex: 1;
+  border: 1.5px solid rgba(201, 168, 76, 0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1a3a22;
+  background: #fffdf7;
+  outline: none;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+  transition: border-color 0.2s;
+}
+
+.promoInput:focus {
+  border-color: #c9a84c;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}
+
+.promoInput::placeholder {
+  color: #c0b5a2;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.promoApplyBtn {
+  padding: 10px 18px;
+  background: #1a3a22;
+  color: #f5f0e8;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.promoApplyBtn:hover {
+  background: #0d2b1a;
+  transform: translateY(-1px);
+}
+
+.promoError {
+  font-size: 12px;
+  color: #c0392b;
+  margin: 6px 0 0;
+}
+
+.promoHint {
+  font-size: 12px;
+  color: #a89a7a;
+  margin: 6px 0 0;
+}
+
+.promoHint strong {
+  color: #c9a84c;
+}
+
+/* ── Promo Applied State ── */
+.promoSuccess {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(29, 110, 63, 0.08);
+  border: 1.5px solid rgba(29, 110, 63, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.promoSuccessLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promoSuccessIcon {
+  color: #1d6b3f;
+  display: flex;
+}
+
+.promoSuccessCode {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d6b3f;
+  margin: 0;
+}
+
+.promoSuccessSaving {
+  font-size: 12px;
+  color: #2d7a4f;
+  margin: 2px 0 0;
+}
+
+.promoRemoveBtn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #a89a7a;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.promoRemoveBtn:hover {
+  color: #c0392b;
+}
+
+/* ── Discount line in summary ── */
+.discountLabel {
+  font-size: 13px;
+  color: #1d6b3f;
+  font-weight: 500;
+}
+
+.discountAmount {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1d6b3f;
+}

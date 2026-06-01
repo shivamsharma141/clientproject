@@ -4,16 +4,16 @@ import { useRouter } from 'next/navigation';
 import styles from './product.module.css';
 import { useCart } from '../component/Cartcontext.js';
 
-// ── TABS ARRAY ─────────────────────────────────────────────────
 const TABS = [
   { key: 'all', label: 'All Products' },
   { key: 'ghee', label: 'Ghee' },
   { key: 'oil', label: 'Cold Pressed Oils' },
   { key: 'butter', label: 'Butter' },
   { key: 'paneer', label: 'Paneer' },
+  { key: 'buttermilk', label: 'Buttermilk' },
+  { key: 'curd', label: 'Curd' },
 ];
 
-// ── PRODUCTS ───────────────────────────────────────────────────
 const PRODUCTS = [
   {
     id: 'ghee-a2',
@@ -103,20 +103,33 @@ const PRODUCTS = [
       { label: '1 Kg (Poly Pack)', price: 470 },
     ],
   },
+  {
+    id: 'buttermilk',
+    category: 'buttermilk',
+    categoryLabel: 'Buttermilk · Fresh Chaach',
+    name: 'Fresh Buttermilk (Chaach)',
+    badge: 'FRESH',
+    icon: '🥛',
+    image: '/buttermilk.png',
+    variants: [
+      { label: '1 Litre', price: 70 },
+      { label: '5 Litres', price: 300 },
+    ],
+  },
+  {
+    id: 'curd',
+    category: 'curd',
+    categoryLabel: 'Curd · Fresh Dahi',
+    name: 'Fresh Curd (Dahi)',
+    badge: 'FRESH',
+    icon: '🫙',
+    image: '/curdimage.png',
+    variants: [
+      { label: '500 gm', price: 90 },
+      { label: '1 Kg', price: 160 },
+    ],
+  },
 ];
-
-// ── DISCOUNT HELPERS ───────────────────────────────────────────
-// Sirf GHEE products pe 15% discount hai.
-// Ghee me bhi 250ml aur 500ml variants pe koi discount nahi.
-// Oil, Butter, Paneer pe koi discount nahi.
-const isExcludedFromDiscount = (label) =>
-  label.startsWith('250') || label.startsWith('500');
-
-const getDiscountedPrice = (label, price, category) => {
-  if (category !== 'ghee') return null;              // only ghee gets discount
-  if (isExcludedFromDiscount(label)) return null;    // 250ml & 500ml excluded
-  return Math.round(price * 0.85);                   // 15% off
-};
 
 // ── Login Required Toast ───────────────────────────────────────
 function LoginToast({ onClose, onLogin }) {
@@ -134,12 +147,8 @@ function LoginToast({ onClose, onLogin }) {
           <p className={styles.toastMsg}>Please login to continue with your purchase.</p>
         </div>
         <div className={styles.toastActions}>
-          <button className={styles.toastLoginBtn} onClick={onLogin}>
-            Login Now
-          </button>
-          <button className={styles.toastCancelBtn} onClick={onClose}>
-            Cancel
-          </button>
+          <button className={styles.toastLoginBtn} onClick={onLogin}>Login Now</button>
+          <button className={styles.toastCancelBtn} onClick={onClose}>Cancel</button>
         </div>
         <button className={styles.toastClose} onClick={onClose} aria-label="Close">✕</button>
       </div>
@@ -164,12 +173,10 @@ function ProductCard({ product, onLoginRequired }) {
     try {
       const res = await fetch('/api/auth/me', { credentials: 'include' });
       const data = await res.json();
-
       if (!data.user) {
         onLoginRequired();
         return;
       }
-
       addToCart(product, selectedVariant);
       router.push('/checkout');
     } catch {
@@ -179,20 +186,12 @@ function ProductCard({ product, onLoginRequired }) {
 
   const selectedV = product.variants[selectedVariant];
 
-  // Pass product.category so discount only applies to ghee
-  const selectedDisc = getDiscountedPrice(selectedV.label, selectedV.price, product.category);
-
   return (
     <div className={styles.card}>
       {product.badge && (
         <div className={`${styles.badge} ${styles[`badge${product.badge}`]}`}>
           {product.badge}
         </div>
-      )}
-
-      {/* 15% OFF tag — only shows on ghee cards */}
-      {product.category === 'ghee' && (
-        <div className={styles.discountTag}>15% OFF</div>
       )}
 
       <div className={styles.cardImg}>
@@ -212,66 +211,28 @@ function ProductCard({ product, onLoginRequired }) {
         <p className={styles.cardType}>{product.categoryLabel}</p>
         <h3 className={styles.cardName}>{product.name}</h3>
 
-        {/* Ghee discount note below product name */}
-        {product.category === 'ghee' && (
-          <p className={styles.discountNote}>
-             15% discount on 1 Ltr & above variants
-          </p>
-        )}
-
         <div className={styles.variantList}>
-          {product.variants.map((v, i) => {
-            // Pass product.category — discount only on ghee
-            const disc = getDiscountedPrice(v.label, v.price, product.category);
-            return (
-              <button
-                key={i}
-                className={`${styles.variantRow} ${selectedVariant === i ? styles.variantSelected : ''}`}
-                onClick={() => setSelectedVariant(i)}
-              >
-                <span className={styles.variantLabel}>{v.label}</span>
-                <span className={styles.variantPriceWrap}>
-                  {disc ? (
-                    <>
-                      <span className={styles.originalPrice}>
-                        ₹{v.price.toLocaleString('en-IN')}
-                      </span>
-                      <span className={styles.variantPrice}>
-                        <span className={styles.rupee}>₹</span>
-                        {disc.toLocaleString('en-IN')}
-                      </span>
-                    </>
-                  ) : (
-                    <span className={styles.variantPrice}>
-                      <span className={styles.rupee}>₹</span>
-                      {v.price.toLocaleString('en-IN')}
-                    </span>
-                  )}
-                </span>
-              </button>
-            );
-          })}
+          {product.variants.map((v, i) => (
+            <button
+              key={i}
+              className={`${styles.variantRow} ${selectedVariant === i ? styles.variantSelected : ''}`}
+              onClick={() => setSelectedVariant(i)}
+            >
+              <span className={styles.variantLabel}>{v.label}</span>
+              <span className={styles.variantPrice}>
+                <span className={styles.rupee}>₹</span>
+                {v.price.toLocaleString('en-IN')}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
       <div className={styles.cardFooter}>
         <div className={styles.selectedInfo}>
           <span className={styles.selectedLabel}>{selectedV.label}</span>
-          <span className={styles.selectedPriceWrap}>
-            {selectedDisc ? (
-              <>
-                <span className={styles.originalPriceLg}>
-                  ₹{selectedV.price.toLocaleString('en-IN')}
-                </span>
-                <span className={styles.selectedPrice}>
-                  ₹{selectedDisc.toLocaleString('en-IN')}
-                </span>
-              </>
-            ) : (
-              <span className={styles.selectedPrice}>
-                ₹{selectedV.price.toLocaleString('en-IN')}
-              </span>
-            )}
+          <span className={styles.selectedPrice}>
+            ₹{selectedV.price.toLocaleString('en-IN')}
           </span>
         </div>
 
@@ -338,9 +299,9 @@ export default function Products() {
         with care, tradition, and zero compromise.
       </p>
 
-      {/* Ghee discount announcement banner */}
+      {/* Promo code announcement banner */}
       <div className={styles.discountBanner}>
-        🧈 Special Offer: Get <strong>15% OFF</strong> on all Ghee products (1 Ltr & above)!
+        🎉 Use code <strong>GAAV15</strong> at checkout for <strong>15% off</strong> your entire order!
       </div>
 
       <div className={styles.tabs}>
