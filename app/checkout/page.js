@@ -499,20 +499,19 @@ export default function CheckoutPage() {
                   <div><div className={styles.iName}>Subtotal</div></div>
                   <div className={styles.iPrice}>₹{cartSubtotal.toLocaleString("en-IN")}</div>
                 </div>
-
-                {promoApplied && (
-                  <div className={styles.summaryItem}>
-                    <div>
-                      <div className={styles.iName} style={{ color: "#1d6b3f" }}>
-                        Promo: {promoCode}
-                      </div>
-                      <div className={styles.iQty}>15% discount applied</div>
-                    </div>
-                    <div className={styles.iPrice} style={{ color: "#1d6b3f" }}>
-                      − ₹{discountAmount.toLocaleString("en-IN")}
-                    </div>
-                  </div>
-                )}
+{promoApplied && (
+  <div className={styles.summaryItem}>
+    <div>
+      <div className={styles.iName} style={{ color: "#1d6b3f" }}>
+        Promo: {promoCode}
+      </div>
+      <div className={styles.iQty}>{Math.round((discountAmount / cartSubtotal) * 100)}% discount applied</div>
+    </div>
+    <div className={styles.iPrice} style={{ color: "#1d6b3f" }}>
+      − ₹{discountAmount.toLocaleString("en-IN")}
+    </div>
+  </div>
+)}
 
                 <div className={styles.divider} />
                 <div className={styles.totalRow}>

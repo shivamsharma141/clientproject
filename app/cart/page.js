@@ -135,7 +135,7 @@ export default function CartPage() {
 
         {/* Promo banner at top */}
         <div className={styles.promoBanner}>
-          🎉 Use code <strong>GAAV15</strong> at checkout to get <strong>15% off</strong> on your entire order!
+          🎉 Use code <strong>GAAV15</strong> at checkout to get <strong>upto 15% off</strong> on your entire order!
         </div>
 
         <div className={styles.pageHeader}>
@@ -238,7 +238,7 @@ export default function CartPage() {
                       <input
                         type="text"
                         className={styles.promoInput}
-                        placeholder="Enter promo code"
+                        placeholder="Use GAAV15 for upto 15% off"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
                         onKeyDown={(e) => e.key === "Enter" && handleApplyPromo()}
@@ -250,7 +250,7 @@ export default function CartPage() {
                     {promoError && (
                       <p className={styles.promoError}>{promoError}</p>
                     )}
-                    <p className={styles.promoHint}>Try: <strong>GAAV15</strong> for 15% off</p>
+                    <p className={styles.promoHint}>Use code <strong>GAAV15</strong> to get upto 15% off!</p>
                   </>
                 ) : (
                   <div className={styles.promoSuccess}>
@@ -273,7 +273,7 @@ export default function CartPage() {
               {/* Discount line (only when applied) */}
               {promoApplied && (
                 <div className={styles.summaryLine}>
-                  <span className={styles.discountLabel}>Discount (15%)</span>
+                  <span className={styles.discountLabel}>Discount ({discountAmount > 0 ? Math.round((discountAmount / cartSubtotal) * 100) : 0}%)</span>
                   <span className={styles.discountAmount}>
                     − ₹{discountAmount.toLocaleString("en-IN")}
                   </span>

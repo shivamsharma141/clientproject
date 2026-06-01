@@ -131,7 +131,6 @@ const PRODUCTS = [
   },
 ];
 
-// ── Login Required Toast ───────────────────────────────────────
 function LoginToast({ onClose, onLogin }) {
   return (
     <div className={styles.toastOverlay} onClick={onClose}>
@@ -156,7 +155,6 @@ function LoginToast({ onClose, onLogin }) {
   );
 }
 
-// ── Product Card ───────────────────────────────────────────────
 function ProductCard({ product, onLoginRequired }) {
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [added, setAdded] = useState(false);
@@ -263,7 +261,6 @@ function ProductCard({ product, onLoginRequired }) {
   );
 }
 
-// ── Main Products Page ─────────────────────────────────────────
 export default function Products() {
   const [activeTab, setActiveTab] = useState('all');
   const [showLoginToast, setShowLoginToast] = useState(false);
@@ -301,7 +298,7 @@ export default function Products() {
 
       {/* Promo code announcement banner */}
       <div className={styles.discountBanner}>
-        🎉 Use code <strong>GAAV15</strong> at checkout for <strong>15% off</strong> your entire order!
+        🎉 Use code <strong>GAAV15</strong> at checkout for <strong>upto 15% off</strong> your entire order!
       </div>
 
       <div className={styles.tabs}>

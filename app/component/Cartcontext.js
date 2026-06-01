@@ -11,7 +11,7 @@ import React, {
 const CartContext = createContext(null);
 
 const PROMO_CODES = {
-  GAAV15: 15,
+  GAAV15: 7,
 };
 
 export function CartProvider({ children }) {
@@ -95,7 +95,7 @@ export function CartProvider({ children }) {
       setPromoApplied(true);
       setPromoError("");
     } else {
-      setPromoError("Invalid promo code. Try GAAV15.");
+      setPromoError("Invalid promo code.");
       setPromoApplied(false);
       setPromoDiscount(0);
     }
@@ -116,7 +116,7 @@ export function CartProvider({ children }) {
   );
 
   const discountAmount = promoApplied
-    ? Math.round(cartSubtotal * promoDiscount / 100)
+    ? Math.round((cartSubtotal * promoDiscount) / 100)
     : 0;
 
   const cartTotal = cartSubtotal - discountAmount;

@@ -142,7 +142,7 @@ export default function Home() {
               <div className={styles.glowHalo}></div>
               <div className={styles.imgCircle}>
                 <img
-                  src="https://as2.ftcdn.net/v2/jpg/11/78/19/51/1000_F_1178195135_SqX3awKdhZaBlCPYxkE8mXwKmTqP4xBo.jpg"
+                  src="https://static.vecteezy.com/system/resources/previews/001/863/039/non_2x/cows-eating-grass-on-the-farm-free-photo.jpg"
                   alt="Pure A2 Bilona Ghee in a glass jar"
                   className={styles.gheeImg}
                 />

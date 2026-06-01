@@ -109,7 +109,6 @@
   transform: translateY(-2px);
 }
 
-/* Image */
 .itemImg {
   width: 76px;
   height: 76px;
@@ -135,7 +134,6 @@
 
 .itemIcon { font-size: 2.2rem; }
 
-/* Info */
 .itemInfo {
   flex: 1;
   min-width: 0;
@@ -169,7 +167,6 @@
   margin: 0;
 }
 
-/* Right block */
 .itemRight {
   display: flex;
   flex-direction: column;
@@ -195,7 +192,6 @@
   color: #aab8a0;
 }
 
-/* Actions row */
 .itemActions {
   display: flex;
   align-items: center;
@@ -467,7 +463,7 @@
 }
 
 /* ══════════════════════════════════════════════
-   LOGIN TOAST — BEAUTIFUL MODAL
+   LOGIN TOAST
 ══════════════════════════════════════════════ */
 .toastOverlay {
   position: fixed;
@@ -503,7 +499,6 @@
   overflow: hidden;
 }
 
-/* top green accent bar */
 .toast::before {
   content: '';
   position: absolute;
@@ -526,7 +521,6 @@
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Close button */
 .toastClose {
   position: absolute;
   top: 16px;
@@ -549,7 +543,6 @@
   color: #1a2e14;
 }
 
-/* Icon */
 .toastIconWrap {
   position: relative;
   width: 76px;
@@ -582,7 +575,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Text */
 .toastBody {
   margin-bottom: 28px;
 }
@@ -606,7 +598,6 @@
   margin-inline: auto;
 }
 
-/* Buttons */
 .toastActions {
   display: flex;
   flex-direction: column;
@@ -668,15 +659,12 @@
 
 @media (max-width: 640px) {
   .page { padding: 32px 0 60px; }
-
   .pageHeader { margin-bottom: 24px; }
-
   .cartCard {
     flex-wrap: wrap;
     gap: 12px;
     padding: 16px;
   }
-
   .itemRight {
     flex-direction: row;
     align-items: center;
@@ -685,16 +673,12 @@
     padding-top: 10px;
     border-top: 1px solid #f0ebe0;
   }
-
   .itemImg { width: 64px; height: 64px; }
-
   .summaryCard { padding: 22px 18px 20px; }
-
   .toast {
     padding: 40px 24px 28px;
     border-radius: 20px;
   }
-
   .toastTitle { font-size: 1.4rem; }
 }
 
@@ -704,7 +688,7 @@
   .toastTitle { font-size: 1.3rem; }
 }
 
-/* ── Promo Banner (top of cart page) ── */
+/* ── Promo Banner ── */
 .promoBanner {
   text-align: center;
   background: linear-gradient(135deg, #fffbf0, #fff8e6);
@@ -791,10 +775,6 @@
   margin: 6px 0 0;
 }
 
-.promoHint strong {
-  color: #c9a84c;
-}
-
 /* ── Promo Applied State ── */
 .promoSuccess {
   display: flex;
@@ -846,7 +826,7 @@
   color: #c0392b;
 }
 
-/* ── Discount line in summary ── */
+/* ── Discount line ── */
 .discountLabel {
   font-size: 13px;
   color: #1d6b3f;
